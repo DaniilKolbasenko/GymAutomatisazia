@@ -1,0 +1,57 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymManager.ViewModels"
+        xmlns:models="using:GymManager.Models"
+        x:Class="GymManager.Views.ClientWindow"
+        x:DataType="vm:ClientWindowViewModel"
+        Title="{Binding TitleText}"
+        Width="400" Height="420"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="#25211E"
+        Icon="/Assets/avalonia-logo.ico">
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+  </Window.Styles>
+
+  <Grid Margin="20" RowDefinitions="Auto, *, Auto">
+
+    <TextBlock Grid.Row="0" Text="{Binding TitleText}" FontSize="20" FontWeight="Bold" Foreground="#D9832B" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+    <StackPanel Grid.Row="1" Spacing="15">
+      <StackPanel Spacing="5">
+        <TextBlock Text="ФИО Клиента" FontSize="12" Foreground="#C5BCB6"/>
+        <TextBox Text="{Binding FullName}" PlaceholderText="Иванов Иван Иванович" Height="36"/>
+      </StackPanel>
+
+      <StackPanel Spacing="5">
+        <TextBlock Text="Телефон" FontSize="12" Foreground="#C5BCB6"/>
+        <TextBox Text="{Binding Phone}" PlaceholderText="+7 (999) 999-99-99" Height="36"/>
+      </StackPanel>
+
+      <StackPanel Spacing="5">
+        <TextBlock Text="Дата рождения" FontSize="12" Foreground="#C5BCB6"/>
+        <TextBox Text="{Binding BirthDate}" PlaceholderText="ДД.ММ.ГГГГ" Height="36"/>
+      </StackPanel>
+
+      <StackPanel Spacing="5">
+        <TextBlock Text="Персональный тренер" FontSize="12" Foreground="#C5BCB6"/>
+        <ComboBox ItemsSource="{Binding Trainers}" SelectedItem="{Binding SelectedTrainer}" HorizontalAlignment="Stretch" Height="36">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="models:Trainer">
+              <TextBlock Text="{Binding FullName}" Foreground="White"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+    </StackPanel>
+    
+    <Grid Grid.Row="2" ColumnDefinitions="*, *" Margin="0,20,0,0">
+      <Button Grid.Column="0" Content="Сохранить" Command="{Binding SaveCommand}" Background="#28A745" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="6"/>
+      <Button Grid.Column="1" Content="Отмена" Command="{Binding CancelCommand}" Background="#7D726C" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="10,0,0,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="6"/>
+    </Grid>
+  </Grid>
+</Window>

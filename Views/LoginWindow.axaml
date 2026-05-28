@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GymManager.Views.LoginWindow"
+        Title="Авторизация - GymManager"
+        Width="420" Height="460"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Background="#25211E"
+        Icon="/Assets/avalonia-logo.ico">
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="30">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,10,0,20">
+            <TextBlock Text="GYM MANAGER" 
+                       FontSize="26" 
+                       FontWeight="Bold" 
+                       Foreground="#D9832B" 
+                       HorizontalAlignment="Center"
+                       LetterSpacing="2"/>
+            <TextBlock Text="Автоматизация менеджера тренажерного зала" 
+                       FontSize="12" 
+                       Foreground="#C5BCB6" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,5,0,0"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="15">
+            <StackPanel Spacing="5">
+                <TextBlock Text="Логин администратора" FontSize="12" Foreground="#C5BCB6" FontWeight="SemiBold"/>
+                <TextBox Name="UsernameTextBox" 
+                         PlaceholderText="Введите логин..." 
+                         Height="40" 
+                         CornerRadius="6"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="5">
+                <TextBlock Text="Пароль" FontSize="12" Foreground="#C5BCB6" FontWeight="SemiBold"/>
+                <TextBox Name="PasswordTextBox" 
+                         PlaceholderText="Введите пароль..." 
+                         PasswordChar="●" 
+                         Height="40" 
+                         CornerRadius="6"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+            
+            <TextBlock Name="ErrorTextBlock" 
+                       Text="Неверный логин или пароль" 
+                       Foreground="#FF5555" 
+                       FontSize="13" 
+                       HorizontalAlignment="Center" 
+                       IsVisible="False" 
+                       Margin="0,5,0,0"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" Margin="0,20,0,10">
+            <Button Name="LoginButton" 
+                    Content="Войти в систему" 
+                    Height="45" 
+                    Background="#D9832B" 
+                    Foreground="#25211E" 
+                    FontWeight="Bold" 
+                    FontSize="15"
+                    HorizontalAlignment="Stretch" 
+                    HorizontalContentAlignment="Center" 
+                    VerticalContentAlignment="Center"
+                    CornerRadius="6"
+                    Click="OnLoginClick"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,4 @@
+Working Dir: C:\Users\Aleksandr\.gemini\antigravity\scratch\GymManager\bin\Debug\net8.0
+Database Path: C:\Users\Aleksandr\.gemini\antigravity\scratch\GymManager\bin\Debug\net8.0\gym.db
+Time: 29.05.2026 8:59:22
+DbExists on check: True

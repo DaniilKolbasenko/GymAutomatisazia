@@ -1,0 +1,27 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GymManager.App"
+             xmlns:local="using:GymManager"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Resources>
+        <SolidColorBrush x:Key="TextControlBackground">#3A332E</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlBackgroundPointerOver">#453C37</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlBackgroundFocused">#25211E</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlBorderBrush">#5E524C</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlBorderBrushPointerOver">#D9832B</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlBorderBrushFocused">#D9832B</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlForeground">White</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlForegroundPointerOver">White</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlForegroundFocused">White</SolidColorBrush>
+    </Application.Resources>
+  
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    </Application.Styles>
+</Application>

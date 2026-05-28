@@ -1,0 +1,492 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymManager.ViewModels"
+        xmlns:models="using:GymManager.Models"
+        mc:Ignorable="d" d:DesignWidth="1050" d:DesignHeight="650"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="GymManager.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Панель Администратора - GymManager"
+        Width="1050" Height="650"
+        WindowStartupLocation="CenterScreen"
+        Background="#181825"
+        Icon="/Assets/avalonia-logo.ico">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="15,0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Border Grid.Row="0" Padding="20,15" Background="#11111B">
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <TextBlock Text="GYM MANAGER" FontSize="20" FontWeight="Bold" Foreground="#D9832B"
+                               VerticalAlignment="Center" LetterSpacing="1" />
+                    <TextBlock Text="|" FontSize="20" Foreground="#483F3B" VerticalAlignment="Center" />
+                    <TextBlock Text="Автоматизация менеджера тренажерного зала" FontSize="13" Foreground="#C5BCB6"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="Администратор:" FontSize="13" Foreground="#C5BCB6" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrentAdmin}" FontSize="14" FontWeight="Bold" Foreground="#D9832B"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Row="1" TabStripPlacement="Top" Background="#25211E">
+            <TabItem Header="Клиенты" DataContext="{Binding ClientsTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, *, Auto">
+                        <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="0,0,0,15"
+                              VerticalAlignment="Center">
+                            <TextBox Grid.Column="0" Name="SearchClientTextBox" Text="{Binding SearchText}"
+                                     PlaceholderText="Поиск по имени или телефону..." Height="36" />
+                            <Button Grid.Column="1" Content="Очистить" Command="{Binding ClearSearchCommand}"
+                                    Margin="10,0,0,0" Padding="15,8" Background="#483F3B" Foreground="White" />
+                            <Button Grid.Column="2" Content="Обновить список" Command="{Binding RefreshClientsCommand}"
+                                    Margin="10,0,0,0" Padding="15,8" Background="#483F3B" Foreground="White" />
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,0,0,10">
+                            <DataGrid Name="ClientsGrid" ItemsSource="{Binding Clients}"
+                                      SelectedItem="{Binding SelectedClient}" AutoGenerateColumns="False"
+                                      IsReadOnly="True" GridLinesVisibility="All" Background="#322C28"
+                                      BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                                    <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="*" />
+                                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="120" />
+                                    <DataGridTextColumn Header="Дата рожд." Binding="{Binding BirthDate}" Width="100" />
+                                    <DataGridTextColumn Header="Тренер" Binding="{Binding TrainerName}" Width="120" />
+                                    <DataGridTextColumn Header="Абонемент" Binding="{Binding ActiveSubscriptionName}"
+                                                        Width="120" />
+                                    <DataGridTextColumn Header="Срок до" Binding="{Binding SubscriptionEndDate}"
+                                                        Width="100" />
+                                    <DataGridTextColumn Header="Занятия" Binding="{Binding VisitsLeftText}" Width="80" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
+                            <Button Content="Добавить клиента" Command="{Binding AddClientCommand}"
+                                    Background="#28A745" Foreground="White" Padding="15,10" FontWeight="SemiBold"
+                                    CornerRadius="4" />
+                            <Button Content="Редактировать клиента" Command="{Binding EditClientCommand}"
+                                    Background="#483F3B" Foreground="White" Padding="15,10" FontWeight="SemiBold"
+                                    CornerRadius="4" />
+                            <Button Content="Оформить абонемент" Command="{Binding BuySubCommand}" Background="#D9832B"
+                                    Foreground="#25211E" Padding="15,10" FontWeight="Bold" CornerRadius="4" />
+                            <Button Content="Удалить выбранного" Command="{Binding DeleteClientCommand}"
+                                    Background="#DC3545" Foreground="White" Padding="15,10" FontWeight="SemiBold"
+                                    CornerRadius="4" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Посещения" DataContext="{Binding VisitsTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Регистрация и журнал посещений" FontSize="20" FontWeight="Bold"
+                                   Foreground="#D9832B" Margin="0,0,0,15" />
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*, 350">
+                            <DataGrid Grid.Column="0" Name="VisitsGrid" ItemsSource="{Binding Visits}"
+                                      AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="All"
+                                      Background="#322C28" BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                                    <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding ClientName}" Width="*" />
+                                    <DataGridTextColumn Header="Дата и время входа" Binding="{Binding VisitDate}"
+                                                        Width="200" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Margin="15,0,0,0" Padding="20" VerticalAlignment="Top">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="Быстрая отметка визита" FontSize="16" FontWeight="Bold"
+                                               Foreground="#D9832B" />
+                                    <TextBlock
+                                        Text="Выберите клиента из списка ниже, чтобы зарегистрировать его приход в зал."
+                                        TextWrapping="Wrap" FontSize="12" Foreground="#C5BCB6" />
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Выберите клиента" FontSize="11" Foreground="#C5BCB6" />
+                                        <ComboBox Name="VisitClientsComboBox" ItemsSource="{Binding Clients}"
+                                                  SelectedItem="{Binding SelectedVisitClient}"
+                                                  HorizontalAlignment="Stretch" Height="36">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:Client">
+                                                    <TextBlock Text="{Binding FullName}" Foreground="White" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <Button Content="Зарегистрировать приход" Command="{Binding RegisterVisitCommand}"
+                                            Background="#D9832B" Foreground="#25211E" HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center" Height="40"
+                                            VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="6" />
+
+                                    <Border BorderThickness="1" CornerRadius="4" Padding="10"
+                                            IsVisible="{Binding IsVisitStatusVisible}">
+                                        <TextBlock Text="{Binding VisitStatusText}" TextWrapping="Wrap"
+                                                   HorizontalAlignment="Center" FontWeight="SemiBold"
+                                                   Foreground="White" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Тарифы" DataContext="{Binding SubsTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Виды абонементов (Тарифы)" FontSize="20" FontWeight="Bold"
+                                   Foreground="#D9832B" Margin="0,0,0,15" />
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*, 300">
+                            <DataGrid Grid.Column="0" Name="SubscriptionsGrid" ItemsSource="{Binding Subscriptions}"
+                                      SelectedItem="{Binding SelectedSubscription}" AutoGenerateColumns="False"
+                                      IsReadOnly="True" GridLinesVisibility="All" Background="#322C28"
+                                      BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                                    <DataGridTextColumn Header="Название тарифа" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="Длительность (дней)" Binding="{Binding DurationDays}"
+                                                        Width="150" />
+                                    <DataGridTextColumn Header="Стоимость (руб.)" Binding="{Binding Price}" Width="150" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Margin="15,0,0,0" Padding="15" VerticalAlignment="Top">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="Управление тарифом" FontSize="16" FontWeight="Bold"
+                                               Foreground="#D9832B" />
+
+                                    <TextBox Name="SubIdTextBox" Text="{Binding SubId}" IsVisible="False" />
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Название тарифа" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="SubNameTextBox" Text="{Binding SubName}"
+                                                 PlaceholderText="Месячный абонемент" Height="36" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Срок действия (дней)" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="SubDurationTextBox" Text="{Binding SubDuration}"
+                                                 PlaceholderText="30" Height="36" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Стоимость (руб.)" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="SubPriceTextBox" Text="{Binding SubPrice}"
+                                                 PlaceholderText="1500" Height="36" />
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*, *">
+                                        <Button Grid.Column="0" Content="Сохранить"
+                                                Command="{Binding SaveSubscriptionCommand}" Background="#28A745"
+                                                Foreground="White" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center" Margin="0,0,5,0" Height="36"
+                                                VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                        <Button Grid.Column="1" Content="Очистить"
+                                                Command="{Binding ClearSubscriptionFormCommand}" Background="#7D726C"
+                                                Foreground="White" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center" Margin="5,0,0,0" Height="36"
+                                                VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                    </Grid>
+
+                                    <Button Content="Удалить тариф" Command="{Binding DeleteSubscriptionCommand}"
+                                            Background="#DC3545" Foreground="White" HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center" Height="36"
+                                            VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Тренеры" DataContext="{Binding TrainersTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Список тренеров" FontSize="20" FontWeight="Bold"
+                                   Foreground="#D9832B" Margin="0,0,0,15" />
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*, 300">
+                            <DataGrid Grid.Column="0" Name="TrainersGrid" ItemsSource="{Binding Trainers}"
+                                      SelectedItem="{Binding SelectedTrainer}" AutoGenerateColumns="False"
+                                      IsReadOnly="True" GridLinesVisibility="All" Background="#322C28"
+                                      BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                                    <DataGridTextColumn Header="ФИО Тренера" Binding="{Binding FullName}" Width="*" />
+                                    <DataGridTextColumn Header="Специализация" Binding="{Binding Specialization}"
+                                                        Width="150" />
+                                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="130" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Margin="15,0,0,0" Padding="15" VerticalAlignment="Top">
+                                <ScrollViewer>
+                                    <StackPanel Spacing="15">
+                                        <TextBlock Text="Управление тренером" FontSize="16" FontWeight="Bold"
+                                                   Foreground="#D9832B" />
+
+                                        <TextBox Name="TrainerIdTextBox" Text="{Binding TrainerId}" IsVisible="False" />
+
+                                        <StackPanel Spacing="5">
+                                            <TextBlock Text="ФИО Тренера" FontSize="11" Foreground="#C5BCB6" />
+                                            <TextBox Name="TrainerNameTextBox" Text="{Binding TrainerName}"
+                                                     PlaceholderText="Иванов Иван Иванович" Height="36" />
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="5">
+                                            <TextBlock Text="Специализация" FontSize="11" Foreground="#C5BCB6" />
+                                            <TextBox Name="TrainerSpecTextBox" Text="{Binding TrainerSpec}"
+                                                     PlaceholderText="Кроссфит" Height="36" />
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="5">
+                                            <TextBlock Text="Телефон" FontSize="11" Foreground="#C5BCB6" />
+                                            <TextBox Name="TrainerPhoneTextBox" Text="{Binding TrainerPhone}"
+                                                     PlaceholderText="+7 (999) 999-99-99" Height="36" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, *">
+                                            <Button Grid.Column="0" Content="Сохранить"
+                                                    Command="{Binding SaveTrainerCommand}" Background="#28A745"
+                                                    Foreground="White" HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Center" Margin="0,0,5,0" Height="36"
+                                                    VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                            <Button Grid.Column="1" Content="Очистить"
+                                                    Command="{Binding ClearTrainerFormCommand}" Background="#7D726C"
+                                                    Foreground="White" HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Center" Margin="5,0,0,0" Height="36"
+                                                    VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                        </Grid>
+
+                                        <Button Content="Удалить тренера" Command="{Binding DeleteTrainerCommand}"
+                                                Background="#DC3545" Foreground="White" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center" Height="36"
+                                                VerticalContentAlignment="Center" FontWeight="SemiBold" />
+
+                                        <Border Height="1" Background="#483F3B" Margin="0,10" />
+
+                                        <TextBlock Text="Клиенты тренера" FontSize="14" FontWeight="Bold"
+                                                   Foreground="#D9832B" Margin="0,0,0,5" />
+                                        <ListBox Name="TrainerClientsListBox" ItemsSource="{Binding TrainerClients}"
+                                                 Height="140" Background="#25211E" BorderBrush="#483F3B"
+                                                 BorderThickness="1" CornerRadius="4">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:Client">
+                                                    <StackPanel Margin="5">
+                                                        <TextBlock Text="{Binding FullName}" FontWeight="SemiBold"
+                                                                   FontSize="13" Foreground="White" />
+                                                        <TextBlock Text="{Binding Phone}" FontSize="11"
+                                                                   Foreground="#C5BCB6" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Администраторы" DataContext="{Binding AdminsTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, *">
+                        <TextBlock Grid.Row="0" Text="Управление учетными записями" FontSize="20" FontWeight="Bold"
+                                   Foreground="#D9832B" Margin="0,0,0,15" />
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*, 300">
+                            <DataGrid Grid.Column="0" Name="AdminsGrid" ItemsSource="{Binding Administrators}"
+                                      SelectedItem="{Binding SelectedAdmin}" AutoGenerateColumns="False"
+                                      IsReadOnly="True" GridLinesVisibility="All" Background="#322C28"
+                                      BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                                    <DataGridTextColumn Header="Имя пользователя (Логин)" Binding="{Binding Username}"
+                                                        Width="*" />
+                                    <DataGridTextColumn Header="Роль" Binding="{Binding Role}" Width="150" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Margin="15,0,0,0" Padding="15" VerticalAlignment="Top">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="Добавить администратора" FontSize="16" FontWeight="Bold"
+                                               Foreground="#D9832B" />
+
+                                    <TextBox Name="AdminIdTextBox" Text="{Binding AdminId}" IsVisible="False" />
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Логин (имя пользователя)" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="AdminUsernameTextBox" Text="{Binding AdminUsername}"
+                                                 PlaceholderText="Введите логин..." Height="36" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Пароль" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="AdminPasswordTextBox" Text="{Binding AdminPassword}"
+                                                 PasswordChar="●" PlaceholderText="Введите пароль..." Height="36" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Роль" FontSize="11" Foreground="#C5BCB6" />
+                                        <TextBox Name="AdminRoleTextBox" Text="{Binding AdminRole}" IsReadOnly="True"
+                                                 Height="36" />
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*, *">
+                                        <Button Grid.Column="0" Content="Сохранить"
+                                                Command="{Binding SaveAdminCommand}" Background="#28A745"
+                                                Foreground="White" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center" Margin="0,0,5,0" Height="36"
+                                                VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                        <Button Grid.Column="1" Content="Очистить"
+                                                Command="{Binding ClearAdminFormCommand}" Background="#7D726C"
+                                                Foreground="White" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center" Margin="5,0,0,0" Height="36"
+                                                VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                    </Grid>
+
+                                    <Button Content="Удалить аккаунт" Command="{Binding DeleteAdminCommand}"
+                                            Background="#DC3545" Foreground="White" HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center" Height="36"
+                                            VerticalContentAlignment="Center" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Статистика" DataContext="{Binding StatsTab}">
+                <Border Padding="20">
+                    <Grid RowDefinitions="Auto, Auto, *">
+                        <TextBlock Grid.Row="0" Text="Статистика и отчеты" FontSize="20" FontWeight="Bold"
+                                   Foreground="#D9832B" Margin="0,0,0,20" />
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*, *, *, *" Margin="0,0,0,20">
+                            <Border Grid.Column="0" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="15" Margin="0,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="Всего клиентов" FontSize="12" Foreground="#C5BCB6" />
+                                    <TextBlock Text="{Binding TotalMembers}" FontSize="28" FontWeight="Bold"
+                                               Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="15" Margin="8,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="Активные абонементы" FontSize="12" Foreground="#C5BCB6" />
+                                    <TextBlock Text="{Binding ActiveSubscriptions}" FontSize="28" FontWeight="Bold"
+                                               Foreground="#4CAF50" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="15" Margin="8,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="Посещений сегодня" FontSize="12" Foreground="#C5BCB6" />
+                                    <TextBlock Text="{Binding TodayVisits}" FontSize="28" FontWeight="Bold"
+                                               Foreground="#2196F3" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="3" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="15" Margin="8,0,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Общая выручка" FontSize="12" Foreground="#C5BCB6" />
+                                    <TextBlock Text="{Binding TotalRevenue}" FontSize="28" FontWeight="Bold"
+                                               Foreground="#D9832B" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Grid Grid.Row="2" ColumnDefinitions="*, 350">
+                            <Border Grid.Column="0" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="20" Margin="0,0,15,0">
+                                <Grid RowDefinitions="Auto, *">
+                                    <TextBlock Grid.Row="0" Text="Популярность тарифов (продано абонементов)"
+                                               FontSize="16" FontWeight="Bold" Foreground="White" Margin="0,0,0,15" />
+                                    <ScrollViewer Grid.Row="1">
+                                        <ItemsControl ItemsSource="{Binding ChartItems}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:ChartItem">
+                                                    <Grid Margin="0,5" ColumnDefinitions="200, *, 60">
+                                                        <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                                   Foreground="White" VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                        <ProgressBar Grid.Column="1" Minimum="0"
+                                                                     Maximum="{Binding MaxCount}"
+                                                                     Value="{Binding Count}" Height="16"
+                                                                     Foreground="#D9832B" Background="#25211E"
+                                                                     VerticalAlignment="Center" Margin="10,0" />
+                                                        <TextBlock Grid.Column="2"
+                                                                   Text="{Binding Count, StringFormat='\{0\} шт.'}"
+                                                                   Foreground="#C5BCB6" VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Right" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="#322C28" CornerRadius="6" BorderBrush="#483F3B"
+                                    BorderThickness="1" Padding="20">
+                                <Grid RowDefinitions="Auto, *">
+                                    <TextBlock Grid.Row="0" Text="Истекающие абонементы (3 дня)" FontSize="16"
+                                               FontWeight="Bold" Foreground="#FF5555" Margin="0,0,0,15" />
+                                    <ListBox Grid.Row="1" Name="ExpiringSubsListBox"
+                                             ItemsSource="{Binding ExpiringClients}" Background="#25211E"
+                                             BorderBrush="#483F3B" BorderThickness="1" CornerRadius="6">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:Client">
+                                                <StackPanel Margin="5" Spacing="2">
+                                                    <TextBlock Text="{Binding FullName}" FontWeight="Bold"
+                                                               FontSize="13" Foreground="White" />
+                                                    <TextBlock Text="{Binding ActiveSubscriptionName}" FontSize="11"
+                                                               Foreground="#D9832B" />
+                                                    <TextBlock
+                                                        Text="{Binding SubscriptionEndDate, StringFormat='Истекает: {0}'}"
+                                                        FontSize="11" Foreground="#FF5555" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
