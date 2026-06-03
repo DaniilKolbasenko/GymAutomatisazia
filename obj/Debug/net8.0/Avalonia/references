@@ -27,7 +27,6 @@ C:\Users\Aleksandr\.nuget\packages\communitytoolkit.mvvm\8.4.1\lib\net8.0\Commun
 C:\Users\Aleksandr\.nuget\packages\harfbuzzsharp\8.3.1.3\lib\net8.0\HarfBuzzSharp.dll
 C:\Users\Aleksandr\.nuget\packages\microcom.runtime\0.11.4\lib\net5.0\MicroCom.Runtime.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\Microsoft.CSharp.dll
-C:\Users\Aleksandr\.nuget\packages\microsoft.data.sqlite.core\8.0.8\lib\net8.0\Microsoft.Data.Sqlite.dll
 C:\Users\Aleksandr\.nuget\packages\microsoft.extensions.configuration.abstractions\8.0.0\lib\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
 C:\Users\Aleksandr\.nuget\packages\microsoft.extensions.configuration.binder\8.0.0\lib\net8.0\Microsoft.Extensions.Configuration.Binder.dll
 C:\Users\Aleksandr\.nuget\packages\microsoft.extensions.configuration.commandline\8.0.0\lib\net8.0\Microsoft.Extensions.Configuration.CommandLine.dll
@@ -61,11 +60,9 @@ C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\Micros
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\Microsoft.Win32.Primitives.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\Microsoft.Win32.Registry.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\mscorlib.dll
+C:\Users\Aleksandr\.nuget\packages\mysqlconnector\2.3.7\lib\net8.0\MySqlConnector.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\netstandard.dll
 C:\Users\Aleksandr\.nuget\packages\skiasharp\3.119.4-preview.1.1\ref\net6.0\SkiaSharp.dll
-C:\Users\Aleksandr\.nuget\packages\sqlitepclraw.bundle_e_sqlite3\2.1.6\lib\netstandard2.0\SQLitePCLRaw.batteries_v2.dll
-C:\Users\Aleksandr\.nuget\packages\sqlitepclraw.core\2.1.6\lib\netstandard2.0\SQLitePCLRaw.core.dll
-C:\Users\Aleksandr\.nuget\packages\sqlitepclraw.provider.e_sqlite3\2.1.6\lib\net6.0\SQLitePCLRaw.provider.e_sqlite3.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\System.AppContext.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\System.Buffers.dll
 C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.27\ref\net8.0\System.Collections.Concurrent.dll

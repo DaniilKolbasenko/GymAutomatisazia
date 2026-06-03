@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using Microsoft.Extensions.Options;
 using GymManager.Models;
 
@@ -19,11 +19,11 @@ namespace GymManager.DB
         {
             string hash = HashHelper.HashPassword(password);
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "SELECT id, username, role FROM users WHERE username = @username AND password_hash = @hash LIMIT 1";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@username", username);
                     cmd.Parameters.AddWithValue("@hash", hash);
@@ -48,11 +48,11 @@ namespace GymManager.DB
         public List<User> GetAll()
         {
             var list = new List<User>();
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "SELECT id, username, role FROM users ORDER BY username ASC";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -72,11 +72,11 @@ namespace GymManager.DB
         public void Add(User user, string password)
         {
             string hash = HashHelper.HashPassword(password);
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "INSERT INTO users (username, password_hash, role) VALUES (@username, @hash, @role)";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@username", user.Username);
                     cmd.Parameters.AddWithValue("@hash", hash);
@@ -88,11 +88,11 @@ namespace GymManager.DB
 
         public void Delete(int id)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "DELETE FROM users WHERE id = @id";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();

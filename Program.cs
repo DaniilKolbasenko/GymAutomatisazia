@@ -25,8 +25,6 @@ sealed class Program
             {
                 s.Configure<DbConfig>(c.Configuration.GetSection("DatabaseConnection"));
 
-                s.AddSingleton<DbInit>();
-
                 s.AddSingleton<UserRepo>();
                 s.AddSingleton<ClientRepo>();
                 s.AddSingleton<SubRepo>();

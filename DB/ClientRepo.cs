@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using Microsoft.Extensions.Options;
 using GymManager.Models;
 
@@ -19,7 +19,7 @@ namespace GymManager.DB
         {
             var clients = new List<Client>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 
@@ -29,18 +29,18 @@ namespace GymManager.DB
                         s.name AS sub_name,
                         ms.end_date,
                         ms.visits_left,
-                        (date(ms.end_date) >= date('now') AND (ms.visits_left IS NULL OR ms.visits_left > 0)) AS is_active
+                        (ms.end_date >= CURDATE() AND (ms.visits_left IS NULL OR ms.visits_left > 0)) AS is_active
                     FROM members m
                     LEFT JOIN trainers t ON m.trainer_id = t.id
                     LEFT JOIN member_subscriptions ms ON m.id = ms.member_id 
-                        AND date(ms.end_date) >= date('now') 
+                        AND ms.end_date >= CURDATE() 
                         AND (ms.visits_left IS NULL OR ms.visits_left > 0)
                     LEFT JOIN subscriptions s ON ms.subscription_id = s.id
                     WHERE @search = '' OR m.full_name LIKE @searchPattern OR m.phone LIKE @searchPattern
                     GROUP BY m.id
                     ORDER BY m.full_name ASC";
 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@search", search);
                     command.Parameters.AddWithValue("@searchPattern", $"%{search}%");
@@ -89,12 +89,12 @@ namespace GymManager.DB
 
         public void Add(Client client)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "INSERT INTO members (full_name, phone, birth_date, join_date, trainer_id) VALUES (@fullName, @phone, @birthDate, @joinDate, @trainerId)";
                 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@fullName", client.FullName);
                     command.Parameters.AddWithValue("@phone", client.Phone);
@@ -108,12 +108,12 @@ namespace GymManager.DB
 
         public void Update(Client client)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "UPDATE members SET full_name = @fullName, phone = @phone, birth_date = @birthDate, trainer_id = @trainerId WHERE id = @id";
                 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@id", client.Id);
                     command.Parameters.AddWithValue("@fullName", client.FullName);
@@ -127,12 +127,12 @@ namespace GymManager.DB
 
         public void Delete(int id)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "DELETE FROM members WHERE id = @id";
                 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@id", id);
                     command.ExecuteNonQuery();
@@ -142,7 +142,7 @@ namespace GymManager.DB
 
         public void AddSub(int clientId, int subscriptionId)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 
@@ -150,7 +150,7 @@ namespace GymManager.DB
                 string subName = "";
 
                 string selectQuery = "SELECT name, duration_days FROM subscriptions WHERE id = @id";
-                using (var cmd = new SqliteCommand(selectQuery, connection))
+                using (var cmd = new MySqlCommand(selectQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", subscriptionId);
                     using (var reader = cmd.ExecuteReader())
@@ -171,14 +171,14 @@ namespace GymManager.DB
                         SELECT id, end_date 
                         FROM member_subscriptions 
                         WHERE member_id = @clientId 
-                          AND date(end_date) >= date('now')
+                          AND end_date >= CURDATE()
                           AND (visits_left IS NULL OR visits_left > 0)
                         ORDER BY end_date DESC LIMIT 1";
 
                     int activeSubId = -1;
                     string activeEndDateStr = "";
 
-                    using (var cmd = new SqliteCommand(activeSubQuery, connection))
+                    using (var cmd = new MySqlCommand(activeSubQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@clientId", clientId);
                         using (var reader = cmd.ExecuteReader())
@@ -195,7 +195,7 @@ namespace GymManager.DB
                     {
                         string extendedEndDate = activeEndDate.AddDays(durationDays).ToString("yyyy-MM-dd");
                         string updateActiveSub = "UPDATE member_subscriptions SET end_date = @extendedEndDate WHERE id = @activeSubId";
-                        using (var cmd = new SqliteCommand(updateActiveSub, connection))
+                        using (var cmd = new MySqlCommand(updateActiveSub, connection))
                         {
                             cmd.Parameters.AddWithValue("@extendedEndDate", extendedEndDate);
                             cmd.Parameters.AddWithValue("@activeSubId", activeSubId);
@@ -209,7 +209,7 @@ namespace GymManager.DB
                             INSERT INTO member_subscriptions (member_id, subscription_id, purchase_date, end_date, visits_left) 
                             VALUES (@clientId, @subId, @purchaseDate, @endDate, 0)";
 
-                        using (var cmd = new SqliteCommand(insertQuery, connection))
+                        using (var cmd = new MySqlCommand(insertQuery, connection))
                         {
                             cmd.Parameters.AddWithValue("@clientId", clientId);
                             cmd.Parameters.AddWithValue("@subId", subscriptionId);
@@ -223,12 +223,12 @@ namespace GymManager.DB
                 {
                     string deactivateQuery = @"
                         UPDATE member_subscriptions 
-                        SET end_date = date('now', '-1 day'), 
+                        SET end_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY), 
                             visits_left = CASE WHEN visits_left IS NOT NULL THEN 0 ELSE NULL END
                         WHERE member_id = @clientId 
-                          AND date(end_date) >= date('now')";
+                          AND end_date >= CURDATE()";
 
-                    using (var cmd = new SqliteCommand(deactivateQuery, connection))
+                    using (var cmd = new MySqlCommand(deactivateQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@clientId", clientId);
                         cmd.ExecuteNonQuery();
@@ -254,7 +254,7 @@ namespace GymManager.DB
                         INSERT INTO member_subscriptions (member_id, subscription_id, purchase_date, end_date, visits_left) 
                         VALUES (@clientId, @subId, @purchaseDate, @endDate, @visitsLeft)";
 
-                    using (var cmd = new SqliteCommand(insertQuery, connection))
+                    using (var cmd = new MySqlCommand(insertQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@clientId", clientId);
                         cmd.Parameters.AddWithValue("@subId", subscriptionId);

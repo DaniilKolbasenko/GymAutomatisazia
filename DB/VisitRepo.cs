@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using Microsoft.Extensions.Options;
 using GymManager.Models;
 
@@ -19,7 +19,7 @@ namespace GymManager.DB
         {
             var list = new List<Visit>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = @"
@@ -28,7 +28,7 @@ namespace GymManager.DB
                     JOIN members m ON v.member_id = m.id
                     ORDER BY v.visit_date DESC LIMIT 100";
 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -49,7 +49,7 @@ namespace GymManager.DB
 
         public string AddVisit(int clientId)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
@@ -57,14 +57,14 @@ namespace GymManager.DB
                     SELECT id, visits_left, end_date
                     FROM member_subscriptions
                     WHERE member_id = @clientId 
-                      AND date(end_date) >= date('now')
+                      AND end_date >= CURDATE()
                       AND (visits_left IS NULL OR visits_left > 0)
                     ORDER BY end_date ASC LIMIT 1";
 
                 int subId = -1;
                 object? visitsLeftObj = null;
 
-                using (var cmd = new SqliteCommand(checkQuery, connection))
+                using (var cmd = new MySqlCommand(checkQuery, connection))
                 {
                     cmd.Parameters.AddWithValue("@clientId", clientId);
                     using (var reader = cmd.ExecuteReader())
@@ -87,7 +87,7 @@ namespace GymManager.DB
                     try
                     {
                         string insertVisit = "INSERT INTO visits (member_id, visit_date) VALUES (@clientId, @visitDate)";
-                        using (var cmd = new SqliteCommand(insertVisit, connection, transaction))
+                        using (var cmd = new MySqlCommand(insertVisit, connection, transaction))
                         {
                             cmd.Parameters.AddWithValue("@clientId", clientId);
                             cmd.Parameters.AddWithValue("@visitDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -100,7 +100,7 @@ namespace GymManager.DB
                             int nextVisits = currentVisits - 1;
 
                             string updateSub = "UPDATE member_subscriptions SET visits_left = @visitsLeft WHERE id = @subId";
-                            using (var cmd = new SqliteCommand(updateSub, connection, transaction))
+                            using (var cmd = new MySqlCommand(updateSub, connection, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@visitsLeft", nextVisits);
                                 cmd.Parameters.AddWithValue("@subId", subId);
@@ -124,7 +124,7 @@ namespace GymManager.DB
         {
             var list = new List<Client>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = @"
@@ -132,12 +132,12 @@ namespace GymManager.DB
                     FROM member_subscriptions ms
                     JOIN members m ON ms.member_id = m.id
                     JOIN subscriptions s ON ms.subscription_id = s.id
-                    WHERE date(ms.end_date) >= date('now') 
-                      AND date(ms.end_date) <= date('now', '+3 days')
+                    WHERE ms.end_date >= CURDATE() 
+                      AND ms.end_date <= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
                       AND (ms.visits_left IS NULL OR ms.visits_left > 0)
                     ORDER BY ms.end_date ASC";
 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -161,11 +161,11 @@ namespace GymManager.DB
         {
             var stats = new Dictionary<string, double>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
-                using (var cmd = new SqliteCommand("SELECT COUNT(*) FROM members", connection))
+                using (var cmd = new MySqlCommand("SELECT COUNT(*) FROM members", connection))
                 {
                     stats["TotalMembers"] = Convert.ToDouble(cmd.ExecuteScalar());
                 }
@@ -173,20 +173,20 @@ namespace GymManager.DB
                 string activeSubsQuery = @"
                     SELECT COUNT(DISTINCT member_id) 
                     FROM member_subscriptions 
-                    WHERE date(end_date) >= date('now') 
+                    WHERE end_date >= CURDATE() 
                       AND (visits_left IS NULL OR visits_left > 0)";
-                using (var cmd = new SqliteCommand(activeSubsQuery, connection))
+                using (var cmd = new MySqlCommand(activeSubsQuery, connection))
                 {
                     stats["ActiveSubscriptions"] = Convert.ToDouble(cmd.ExecuteScalar());
                 }
 
-                using (var cmd = new SqliteCommand("SELECT COUNT(*) FROM trainers", connection))
+                using (var cmd = new MySqlCommand("SELECT COUNT(*) FROM trainers", connection))
                 {
                     stats["TotalTrainers"] = Convert.ToDouble(cmd.ExecuteScalar());
                 }
 
-                string todayVisitsQuery = "SELECT COUNT(*) FROM visits WHERE date(visit_date) = date('now')";
-                using (var cmd = new SqliteCommand(todayVisitsQuery, connection))
+                string todayVisitsQuery = "SELECT COUNT(*) FROM visits WHERE DATE(visit_date) = CURDATE()";
+                using (var cmd = new MySqlCommand(todayVisitsQuery, connection))
                 {
                     stats["TodayVisits"] = Convert.ToDouble(cmd.ExecuteScalar());
                 }
@@ -195,7 +195,7 @@ namespace GymManager.DB
                     SELECT COALESCE(SUM(s.price), 0) 
                     FROM member_subscriptions ms 
                     JOIN subscriptions s ON ms.subscription_id = s.id";
-                using (var cmd = new SqliteCommand(revenueQuery, connection))
+                using (var cmd = new MySqlCommand(revenueQuery, connection))
                 {
                     stats["TotalRevenue"] = Convert.ToDouble(cmd.ExecuteScalar());
                 }
@@ -208,18 +208,18 @@ namespace GymManager.DB
         {
             var dist = new Dictionary<string, int>();
 
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = @"
                     SELECT s.name, COUNT(ms.id) 
                     FROM subscriptions s
                     LEFT JOIN member_subscriptions ms ON s.id = ms.subscription_id
-                        AND date(ms.end_date) >= date('now')
+                        AND ms.end_date >= CURDATE()
                         AND (ms.visits_left IS NULL OR ms.visits_left > 0)
                     GROUP BY s.name";
 
-                using (var command = new SqliteCommand(query, connection))
+                using (var command = new MySqlCommand(query, connection))
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())

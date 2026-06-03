@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using MySqlConnector;
 using Microsoft.Extensions.Options;
 using GymManager.Models;
 
@@ -17,11 +17,11 @@ namespace GymManager.DB
         public List<Subscription> GetAll()
         {
             var list = new List<Subscription>();
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "SELECT id, name, duration_days, price FROM subscriptions ORDER BY price ASC";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -41,11 +41,11 @@ namespace GymManager.DB
 
         public void Add(Subscription sub)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "INSERT INTO subscriptions (name, duration_days, price) VALUES (@name, @duration, @price)";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@name", sub.Name);
                     cmd.Parameters.AddWithValue("@duration", sub.DurationDays);
@@ -57,11 +57,11 @@ namespace GymManager.DB
 
         public void Update(Subscription sub)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "UPDATE subscriptions SET name = @name, duration_days = @duration, price = @price WHERE id = @id";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", sub.Id);
                     cmd.Parameters.AddWithValue("@name", sub.Name);
@@ -74,11 +74,11 @@ namespace GymManager.DB
 
         public void Delete(int id)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = "DELETE FROM subscriptions WHERE id = @id";
-                using (var cmd = new SqliteCommand(query, connection))
+                using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
