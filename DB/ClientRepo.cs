@@ -54,8 +54,8 @@ namespace GymManager.DB
                                 Id = reader.GetInt32(0),
                                 FullName = reader.GetString(1),
                                 Phone = reader.GetString(2),
-                                BirthDate = reader.IsDBNull(3) ? "" : DateHelper.ToDisplayDate(reader.GetString(3)),
-                                JoinDate = DateHelper.ToDisplayDate(reader.GetString(4)),
+                                BirthDate = reader.IsDBNull(3) ? "" : reader.GetDateTime(3).ToString("dd.MM.yyyy"),
+                                JoinDate = reader.GetDateTime(4).ToString("dd.MM.yyyy"),
                                 TrainerId = reader.IsDBNull(5) ? null : (int?)reader.GetInt32(5),
                                 TrainerName = reader.IsDBNull(6) ? "Не назначен" : reader.GetString(6)
                             };
@@ -66,7 +66,7 @@ namespace GymManager.DB
                             {
                                 client.IsSubscriptionActive = true;
                                 client.ActiveSubscriptionName = reader.GetString(7);
-                                client.SubscriptionEndDate = DateHelper.ToDisplayDate(reader.GetString(8));
+                                client.SubscriptionEndDate = reader.GetDateTime(8).ToString("dd.MM.yyyy");
                                 client.VisitsLeftText = reader.IsDBNull(9) ? "Безлимит" : reader.GetInt32(9).ToString();
                             }
                             else
@@ -98,8 +98,9 @@ namespace GymManager.DB
                 {
                     command.Parameters.AddWithValue("@fullName", client.FullName);
                     command.Parameters.AddWithValue("@phone", client.Phone);
-                    command.Parameters.AddWithValue("@birthDate", DateHelper.ToDbDate(client.BirthDate));
-                    command.Parameters.AddWithValue("@joinDate", DateTime.Now.ToString("yyyy-MM-dd"));
+                    string dbBirthDate = DateHelper.ToDbDate(client.BirthDate);
+                    command.Parameters.AddWithValue("@birthDate", string.IsNullOrEmpty(dbBirthDate) ? (object)DBNull.Value : dbBirthDate);
+                    command.Parameters.AddWithValue("@joinDate", DateTime.Today);
                     command.Parameters.AddWithValue("@trainerId", client.TrainerId.HasValue ? (object)client.TrainerId.Value : DBNull.Value);
                     command.ExecuteNonQuery();
                 }
@@ -118,7 +119,8 @@ namespace GymManager.DB
                     command.Parameters.AddWithValue("@id", client.Id);
                     command.Parameters.AddWithValue("@fullName", client.FullName);
                     command.Parameters.AddWithValue("@phone", client.Phone);
-                    command.Parameters.AddWithValue("@birthDate", DateHelper.ToDbDate(client.BirthDate));
+                    string dbBirthDate = DateHelper.ToDbDate(client.BirthDate);
+                    command.Parameters.AddWithValue("@birthDate", string.IsNullOrEmpty(dbBirthDate) ? (object)DBNull.Value : dbBirthDate);
                     command.Parameters.AddWithValue("@trainerId", client.TrainerId.HasValue ? (object)client.TrainerId.Value : DBNull.Value);
                     command.ExecuteNonQuery();
                 }
@@ -176,7 +178,7 @@ namespace GymManager.DB
                         ORDER BY end_date DESC LIMIT 1";
 
                     int activeSubId = -1;
-                    string activeEndDateStr = "";
+                    DateTime? activeEndDate = null;
 
                     using (var cmd = new MySqlCommand(activeSubQuery, connection))
                     {
@@ -186,14 +188,14 @@ namespace GymManager.DB
                             if (reader.Read())
                             {
                                 activeSubId = reader.GetInt32(0);
-                                activeEndDateStr = reader.GetString(1);
+                                activeEndDate = reader.GetDateTime(1);
                             }
                         }
                     }
 
-                    if (activeSubId != -1 && DateTime.TryParse(activeEndDateStr, out DateTime activeEndDate))
+                    if (activeSubId != -1 && activeEndDate.HasValue)
                     {
-                        string extendedEndDate = activeEndDate.AddDays(durationDays).ToString("yyyy-MM-dd");
+                        DateTime extendedEndDate = activeEndDate.Value.AddDays(durationDays);
                         string updateActiveSub = "UPDATE member_subscriptions SET end_date = @extendedEndDate WHERE id = @activeSubId";
                         using (var cmd = new MySqlCommand(updateActiveSub, connection))
                         {
@@ -202,8 +204,8 @@ namespace GymManager.DB
                             cmd.ExecuteNonQuery();
                         }
 
-                        string purchaseDate = DateTime.Now.ToString("yyyy-MM-dd");
-                        string endDate = DateTime.Now.AddDays(durationDays).ToString("yyyy-MM-dd");
+                        DateTime purchaseDate = DateTime.Today;
+                        DateTime endDate = DateTime.Today.AddDays(durationDays);
 
                         string insertQuery = @"
                             INSERT INTO member_subscriptions (member_id, subscription_id, purchase_date, end_date, visits_left) 
@@ -247,8 +249,8 @@ namespace GymManager.DB
                         visitsLimit = 1;
                     }
 
-                    string purchaseDate = DateTime.Now.ToString("yyyy-MM-dd");
-                    string endDate = DateTime.Now.AddDays(durationDays).ToString("yyyy-MM-dd");
+                    DateTime purchaseDate = DateTime.Today;
+                    DateTime endDate = DateTime.Today.AddDays(durationDays);
 
                     string insertQuery = @"
                         INSERT INTO member_subscriptions (member_id, subscription_id, purchase_date, end_date, visits_left) 

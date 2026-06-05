@@ -38,7 +38,7 @@ namespace GymManager.DB
                             Id = reader.GetInt32(0),
                             ClientId = reader.GetInt32(1),
                             ClientName = reader.GetString(2),
-                            VisitDate = DateHelper.ToDisplayDateTime(reader.GetString(3))
+                            VisitDate = reader.GetDateTime(3).ToString("dd.MM.yyyy HH:mm:ss")
                         });
                     }
                 }
@@ -90,7 +90,7 @@ namespace GymManager.DB
                         using (var cmd = new MySqlCommand(insertVisit, connection, transaction))
                         {
                             cmd.Parameters.AddWithValue("@clientId", clientId);
-                            cmd.Parameters.AddWithValue("@visitDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                            cmd.Parameters.AddWithValue("@visitDate", DateTime.Now);
                             cmd.ExecuteNonQuery();
                         }
 
@@ -147,7 +147,7 @@ namespace GymManager.DB
                             Id = reader.GetInt32(0),
                             FullName = reader.GetString(1),
                             Phone = reader.GetString(2),
-                            SubscriptionEndDate = DateHelper.ToDisplayDate(reader.GetString(3)),
+                            SubscriptionEndDate = reader.GetDateTime(3).ToString("dd.MM.yyyy"),
                             ActiveSubscriptionName = reader.GetString(4)
                         });
                     }
