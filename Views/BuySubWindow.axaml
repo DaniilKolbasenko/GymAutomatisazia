@@ -8,47 +8,40 @@
         Width="400" Height="300"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        Background="#25211E"
         Icon="/Assets/avalonia-logo.ico">
 
-  <Window.Styles>
-    <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="White" />
-    </Style>
-  </Window.Styles>
-
   <Grid Margin="20" RowDefinitions="Auto, *, Auto">
-    <TextBlock Grid.Row="0" Text="Оформить абонемент" FontSize="20" FontWeight="Bold" Foreground="#D9832B" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+    <TextBlock Grid.Row="0" Text="Оформить абонемент" FontSize="20" FontWeight="Bold" Foreground="#111111" Margin="0,0,0,20" HorizontalAlignment="Center"/>
 
     <StackPanel Grid.Row="1" Spacing="15">
       <StackPanel Orientation="Horizontal" Spacing="10">
-        <TextBlock Text="Клиент:" FontSize="13" Foreground="#C5BCB6"/>
-        <TextBlock Text="{Binding ClientName}" FontSize="14" FontWeight="Bold" Foreground="White"/>
+        <TextBlock Text="Клиент:" FontSize="13" Foreground="#555555"/>
+        <TextBlock Text="{Binding ClientName}" FontSize="14" FontWeight="Bold"/>
       </StackPanel>
 
       <StackPanel Spacing="5">
-        <TextBlock Text="Выберите тариф" FontSize="12" Foreground="#C5BCB6"/>
-        <ComboBox ItemsSource="{Binding Subscriptions}" SelectedItem="{Binding SelectedSub}" HorizontalAlignment="Stretch" Height="36">
+        <TextBlock Text="Выберите тариф" FontSize="12" Foreground="#555555"/>
+        <ComboBox ItemsSource="{Binding Subscriptions}" SelectedItem="{Binding SelectedSub}" HorizontalAlignment="Stretch" Height="36" CornerRadius="0">
           <ComboBox.ItemTemplate>
             <DataTemplate x:DataType="models:Subscription">
-              <TextBlock Text="{Binding DisplayText}" Foreground="White"/>
+              <TextBlock Text="{Binding DisplayText}"/>
             </DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
       </StackPanel>
 
       <TextBlock Text="{Binding ErrorMessage}" 
-                 Foreground="#FF5555" 
-                 FontSize="12" 
-                 TextWrapping="Wrap"
-                 HorizontalAlignment="Center" 
-                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
-                 Margin="0,10,0,0"/>
+                  Foreground="#FF3333" 
+                  FontSize="12" 
+                  TextWrapping="Wrap"
+                  HorizontalAlignment="Center" 
+                  IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
+                  Margin="0,10,0,0"/>
     </StackPanel>
 
     <Grid Grid.Row="2" ColumnDefinitions="*, *" Margin="0,20,0,0">
-      <Button Grid.Column="0" Content="Оформить" Command="{Binding BuyCommand}" Background="#D9832B" Foreground="#25211E" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="6"/>
-      <Button Grid.Column="1" Content="Отмена" Command="{Binding CancelCommand}" Background="#7D726C" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="10,0,0,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="6"/>
+      <Button Grid.Column="0" Content="Оформить" Command="{Binding BuyCommand}" Background="#111111" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="0"/>
+      <Button Grid.Column="1" Content="Отмена" Command="{Binding CancelCommand}" Background="#7D726C" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="10,0,0,0" Height="40" VerticalContentAlignment="Center" FontWeight="Bold" CornerRadius="0"/>
     </Grid>
   </Grid>
 </Window>
